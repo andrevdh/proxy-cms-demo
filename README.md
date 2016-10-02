@@ -8,7 +8,7 @@
 - Install Virtualbox https://www.virtualbox.org/
 
 1. Create a new docker host (called proxy-cms-demo with 2 cores and 2 gigs of RAM) like this:
-```docker-machine create -d virtualbox proxy-cms-demo --virtualbox-memory 2048 --virtualbox-cpu-count 2```
+```docker-machine create -d virtualbox --virtualbox-memory 2048 --virtualbox-cpu-count 2 proxy-cms-demo```
 
 2. stop the new machine
 ```docker-machine stop proxy-cms-demo```
