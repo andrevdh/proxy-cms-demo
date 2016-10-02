@@ -9,7 +9,7 @@ machine:
 
 dependencies:
   override:
-    - cd ~/proxy-cms-demo-backend/dist ; composer install
+    - cd ~/proxy-cms-demo/dist ; composer install
     - sh ./envsetup.sh staging
     - sudo pip install docker-compose awscli s3cmd
   post:
@@ -19,7 +19,7 @@ test:
   pre:
     - docker-compose up -d
   override:
-    - cd ~/proxy-cms-demo-backend/dist ; phpunit --log-junit junit.xml --process-isolation --coverage-html coverage/ tests/.
+    - cd ~/proxy-cms-demo/dist ; phpunit --log-junit junit.xml --process-isolation --coverage-html coverage/ tests/.
 
 deployment:
   elasticbeanstalk-staging:
