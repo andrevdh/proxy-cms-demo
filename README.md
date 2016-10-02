@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/andrevdh/proxy-cms-demo.svg?style=svg)](https://circleci.com/gh/andrevdh/proxy-cms-demo)
 
 ### Setting up local docker development environment
 
