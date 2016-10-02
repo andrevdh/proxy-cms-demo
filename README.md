@@ -6,8 +6,8 @@
 - `brew install docker docker-machine docker-compose`
 - Install Virtualbox https://www.virtualbox.org/
 
-1. Create a new docker host (called default) like this:
-```docker-machine create -d virtualbox proxy-cms-demo```
+1. Create a new docker host (called proxy-cms-demo with 2 cores and 2 gigs of RAM) like this:
+```docker-machine create -d virtualbox proxy-cms-demo --virtualbox-memory 2048 --virtualbox-cpu-count 2```
 
 2. stop the new machine
 ```docker-machine stop proxy-cms-demo```
