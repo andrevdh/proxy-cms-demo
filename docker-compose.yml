@@ -1,12 +1,4 @@
 # Backend Container
-proxy:
-  image: cms-demo-staging-proxy:$CIRCLE_BUILD_NUM
-  environment:
-    - APP_ENV=staging
-    - APP_DEBUG=true
-  ports:
-    - "80:80"
-
 backend:
   image: cms-demo-staging-backend:$CIRCLE_BUILD_NUM
   environment:
