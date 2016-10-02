@@ -1,0 +1,50 @@
+# BASE CONFIG
+FROM ubuntu:16.04
+MAINTAINER Andre van den Heever <andrevdh@gmail.com>
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN \
+ apt-get update ; \
+ apt-get -y install nodejs \
+                    npm \
+                    curl \
+                    wget \
+                    vim \
+                    telnet \
+                    apache2 \
+                    libapache2-mod-php7.0 \
+                    php7.0 \
+                    php7.0-common \
+                    php7.0-curl \
+                    php7.0-gd \
+                    php7.0-gettext \
+                    php7.0-intl \
+                    php7.0-json \
+                    php7.0-mbstring \
+                    php7.0-mysql \
+                    php7.0-xml \
+                    awscli \
+                    s3cmd
+
+# Install the locales and set the default locale
+RUN locale-gen en_US.UTF-8
+RUN locale-gen fr_FR.UTF-8
+RUN locale-gen pt_PT.UTF-8
+
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+# Install Composer
+RUN /usr/bin/curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+COPY ./dist/ /app/
+
+# Copy Apache config and SSL bits into place
+RUN a2dissite 000-default && a2enmod rewrite expires headers deflate negotiation
+COPY ./server-config/apache2.conf        /etc/apache2/
+
+CMD ["/usr/sbin/apache2ctl","-D","FOREGROUND"]
+
+EXPOSE 80

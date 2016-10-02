@@ -1,0 +1,29 @@
+version: '2'
+services:
+
+    # Frontend Container
+    # web:
+      image: cms-demo-proxy
+      build:
+        dockerfile: ./Dockerfile-cms-demo-proxy
+      environment:
+        - ENV=local
+        - APP_DEBUG=true
+      ports:
+        - "80:80"
+      links:
+        - backend
+
+    # Backend Container
+    backend:
+      image: cms-demo-backend
+      build:
+        context: .
+        dockerfile: ./Dockerfile-cms-demo-backend
+      environment:
+        - APP_ENV=local
+        - APP_DEBUG=true
+      volumes:
+        - /backend/dist:/app:rw
+      ports:
+        - "8080:80"

@@ -1,0 +1,58 @@
+machine:
+  pre:
+    - sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci'
+    - sudo chmod 0755 /usr/bin/docker
+  php:
+    version: 7.0.7
+  services:
+    - docker
+
+dependencies:
+  override:
+    - cd ~/proxy-cms-demo-backend/dist ; composer install
+    - sh ./envsetup.sh staging
+    - sudo pip install docker-compose awscli s3cmd
+  post:
+    - docker login -e $DOCKERHUB_EMAIL -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+    - docker build -t proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-backend .
+test:
+  pre:
+    - docker-compose up -d
+  override:
+    - cd ~/proxy-cms-demo-backend/dist ; phpunit --log-junit junit.xml --process-isolation --coverage-html coverage/ tests/.
+
+deployment:
+  elasticbeanstalk-staging:
+     branch: staging
+     commands:
+       - docker build -t proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-proxy .
+       - docker tag -f proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM}
+       - docker tag -f proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-backend:latest
+       - docker tag -f proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM}
+       - docker tag -f proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-proxy:latest
+       - docker login -e $DOCKERHUB_EMAIL -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+       - docker push andrevdh/proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM}
+       - docker push andrevdh/proxy-cms-demo-staging-backend:latest
+       - docker push andrevdh/proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM}
+       - docker push andrevdh/proxy-cms-demo-staging-proxy:latest
+       - ./deploy.sh ${CIRCLE_BUILD_NUM} proxy staging 80 512 "proxy-cms-demo"
+       - ./deploy.sh ${CIRCLE_BUILD_NUM} backend staging 80 512 "proxy-cms-demo"
+
+  elasticbeanstalk-production:
+     branch: production
+     commands:
+       - sh ./envsetup.sh production
+       - cat .env
+       - docker build -t proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-backend .
+       - docker build -t proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-proxy .
+       - docker tag -f proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM}
+       - docker tag -f proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-backend:latest
+       - docker tag -f proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM}
+       - docker tag -f proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-proxy:latest
+       - docker login -e $DOCKERHUB_EMAIL -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+       - docker push andrevdh/proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM}
+       - docker push andrevdh/proxy-cms-demo-production-backend:latest
+       - docker push andrevdh/proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM}
+       - docker push andrevdh/proxy-cms-demo-production-proxy:latest
+       - ./deploy.sh ${CIRCLE_BUILD_NUM} proxy production 80 512 "proxy-cms-demo"
+       - ./deploy.sh ${CIRCLE_BUILD_NUM} backend production 80 512 "proxy-cms-demo"

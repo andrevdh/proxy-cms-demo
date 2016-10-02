@@ -1,0 +1,21 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "Authentication": {
+        "Bucket": "<EB_BUCKET>",
+        "Key": "dockercfg"
+    },
+    "containerDefinitions": [
+        {
+            "name": "cms-demo-<BUILD_ENV>-<TIER>",
+            "image": "andrevdh/cms-demo-<BUILD_ENV>-<TIER>:<TAG>",
+            "essential": true,
+            "memory": "<CONTAINER_MEM>",
+            "portMappings": [
+                {
+                    "hostPort": <PORT>,
+                   "containerPort": <PORT>
+                }
+            ]
+        }
+    ]
+}
