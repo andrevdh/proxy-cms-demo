@@ -19,7 +19,7 @@ test:
   pre:
     - docker-compose up -d
   override:
-    - cd ~/proxy-cms-demo/dist ; phpunit --log-junit junit.xml --process-isolation --coverage-html coverage/ tests/.
+    - cd ~/proxy-cms-demo/dist ; phpunit --log-junit junit.xml --process-isolation app/tests/.
 
 deployment:
   elasticbeanstalk-staging:
