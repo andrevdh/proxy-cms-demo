@@ -3,7 +3,7 @@ services:
 
     # Nginx Proxy Container
     proxy:
-      image: cms-demo-proxy
+      image: proxy-cms-demo-proxy
       build:
         context: .
         dockerfile: ./Dockerfile-cms-demo-proxy
@@ -17,7 +17,7 @@ services:
 
     # Backend Container
     backend:
-      image: cms-demo-backend
+      image: proxy-cms-demo-backend
       build:
         context: .
         dockerfile: ./Dockerfile-cms-demo-backend
