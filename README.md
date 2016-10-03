@@ -71,11 +71,11 @@ Using the following extra files and scripts we can integrate with some nice tool
 The project comes with a circle.yml file and additional build scripts to do full unit testing and deployment into AWS Elastic Beanstalk applications and environments
 
 ## Docker Hub
-For Docker image storage and distribution into AWS a Docker Hub account is also required (docker build, tagging and pushing all done in circle.yml)
+For Docker image storage and distribution into AWS a DockerHub account is also required (docker build, tagging and pushing all done in circle.yml)
 Docker images are tagged with the CircleCI Build Numbers for quickly rolling back in case of emergency.
 
 ## Slack Chat Channel
-For CircleCI and AWS deployment feedback - Slack integration via a webhook into a chat channel is provided (see the SNED_COMS function in deploy.sh)
+For CircleCI and AWS deployment feedback - Slack integration via a webhook into a chat channel is provided (see the SEND_COMMS function in deploy.sh)
 
 ## AWS deployment into Elastic Beanstalk
 This requires some further setup in AWS with the following additional configurations
