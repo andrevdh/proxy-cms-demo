@@ -70,6 +70,12 @@ Using the following extra files and scripts we can integrate with some nice tool
 ## CircleCI - Continuous Integration and Deployment
 The project comes with a circle.yml file and additional build scripts to do full unit testing and deployment into AWS Elastic Beanstalk applications and environments
 
+## Git Integration
+
+The project tracks the environment and deployment destination using GIT branches.
+
+Currently the demo deployment will be triggered on commits or merges to either the "staging" or "production" branches. Any other branches will just run through to the end of the unit tests and then complete.
+
 ## Docker Hub
 For Docker image storage and distribution into AWS a DockerHub account is also required (docker build, tagging and pushing all done in circle.yml)
 Docker images are tagged with the CircleCI Build Numbers for quickly rolling back in case of emergency.
