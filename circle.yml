@@ -9,50 +9,73 @@ machine:
 
 dependencies:
   override:
+    # this sections gets run first
     - cd ~/proxy-cms-demo/dist ; composer install
     - sh ./envsetup.sh staging
     - sudo pip install docker-compose awscli s3cmd
   post:
+    # this sections gets after initialisation has completed
     - docker login -e $DOCKERHUB_EMAIL -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
     - docker build -t proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-backend .
+
 test:
   pre:
+    # set up the test environment - only the backend is required for unit tests (for now)
     - docker-compose up -d
   override:
+    # unit tests run here
     - cd ~/proxy-cms-demo/dist ; phpunit --log-junit junit.xml --process-isolation app/tests/.
 
 deployment:
   elasticbeanstalk-staging:
      branch: staging
      commands:
+       # build the proxy container
        - docker build -t proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-proxy .
+
+       # tag the containers with build numbers and "latest"
        - docker tag -f proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM}
        - docker tag -f proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-backend:latest
        - docker tag -f proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM}
        - docker tag -f proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-staging-proxy:latest
+
+       # log in to DockerHub
        - docker login -e $DOCKERHUB_EMAIL -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+
+       # push the containers with build numbers and "latest" into each of their repositories
        - docker push andrevdh/proxy-cms-demo-staging-backend:${CIRCLE_BUILD_NUM}
        - docker push andrevdh/proxy-cms-demo-staging-backend:latest
        - docker push andrevdh/proxy-cms-demo-staging-proxy:${CIRCLE_BUILD_NUM}
        - docker push andrevdh/proxy-cms-demo-staging-proxy:latest
+
+       # deploy to AWS - one for each tiers
        - ./deploy.sh ${CIRCLE_BUILD_NUM} proxy staging 80 512 "proxy-cms-demo"
        - ./deploy.sh ${CIRCLE_BUILD_NUM} backend staging 80 512 "proxy-cms-demo"
 
   elasticbeanstalk-production:
      branch: production
      commands:
+       # switch to production by resetting all ENV vars
        - sh ./envsetup.sh production
        - cat .env
+
+       # build and tag all the containers
        - docker build -t proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-backend .
        - docker build -t proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} -f Dockerfile-cms-demo-proxy .
        - docker tag -f proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM}
        - docker tag -f proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-backend:latest
        - docker tag -f proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM}
        - docker tag -f proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM} andrevdh/proxy-cms-demo-production-proxy:latest
+
+       # log in to DockerHub
        - docker login -e $DOCKERHUB_EMAIL -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+
+       # push the containers with build numbers and "latest" into each of their repositories
        - docker push andrevdh/proxy-cms-demo-production-backend:${CIRCLE_BUILD_NUM}
        - docker push andrevdh/proxy-cms-demo-production-backend:latest
        - docker push andrevdh/proxy-cms-demo-production-proxy:${CIRCLE_BUILD_NUM}
        - docker push andrevdh/proxy-cms-demo-production-proxy:latest
+
+       # deploy to AWS - one for each tiers
        - ./deploy.sh ${CIRCLE_BUILD_NUM} proxy production 80 512 "proxy-cms-demo"
        - ./deploy.sh ${CIRCLE_BUILD_NUM} backend production 80 512 "proxy-cms-demo"
