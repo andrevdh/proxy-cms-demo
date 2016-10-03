@@ -68,7 +68,7 @@ Using the following extra files and scripts we can integrate with some nice tool
 - Dockerrun.aws.json.template (used for Elastic Beanstalk deployments via DockerHub and S3)
 
 ## CircleCI - Continuous Integration and Deployment
-The project comes with a circle.yml file and additional build scripts to do full unit testing and deployment into AWS Elastic Beanstalk applications and environments
+The project comes with a circle.yml file and additional build scripts to do full unit testing and deployment into AWS Elastic Beanstalk applications and environments.
 
 ## Git Integration
 
