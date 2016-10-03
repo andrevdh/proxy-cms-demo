@@ -43,7 +43,7 @@ Please note that the basic Laravel app is already included in the source code fo
 5. set up the ENV<br />
 ```eval $(docker-machine env proxy-cms-demo)```
 
-6. map the directory<br />
+6. map the main project directory<br />
 ```docker-machine ssh proxy-cms-demo "sudo sh -c 'mkdir /backend && mount -t vboxsf -o uid=33,gid=33 backend /backend'"```
 
 7. cd to the source folder for the project (in my case ~/Source/proxy-cms-demo)
