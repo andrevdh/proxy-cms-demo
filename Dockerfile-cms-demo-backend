@@ -12,6 +12,7 @@ RUN \
                     wget \
                     vim \
                     telnet \
+                    locales \
                     apache2 \
                     libapache2-mod-php7.0 \
                     php7.0 \
